@@ -119,7 +119,7 @@ tau.sqd.prior <- function(params, hyper.params) {
   # return((-alpha-1)*log(tau_sqd)-beta/tau_sqd)
   tau_sqd <- params[1]
   Max <- hyper.params[1]
-  if ((tau < 0) | (tau > Max)) return(-Inf)
+  if ((tau_sqd < 0) | (tau_sqd > Max)) return(-Inf)
   return(-log(Max))
 }
 
