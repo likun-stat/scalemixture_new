@@ -10,7 +10,7 @@ library(fields)   # For rdist
 n.s <- 100        # Number of sites
 n.t <- 40         # Number of time points
 tau <- 4          # Nugget SD
-delta <- 0.7      # For R
+delta <- 0.53      # For R
 range <- 1        # Matern range
 nu <-  3/2        # Matern smoothness
 

@@ -184,7 +184,7 @@ NumericVector pmixture_me(NumericVector x, double tau_sqd, double delta, double 
             
             if (!ISNAN(err)){
                 result = R::pnorm(x[i]-1, 0.0, sqrt(tau_sqd), 1, 0) - result;
-                if(result > 0.9) result = asymptotic_p(x[i], delta);
+                if(result > 0.98) result = asymptotic_p(x[i], delta);
             }
             else {
                 Rcpp::Rcout << "Error in integration. Returning -1" << std::endl;

@@ -118,7 +118,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   # For tuning Metropolis updates of theta
   # if (is.null(sigma.m$prob.below)) sigma.m$prob.below <- 1
   # if (is.null(sigma.m$X.s)) sigma.m$X.s <- matrix(2.4^2,nrow=n.s,ncol=n.t)
-  if (is.null(sigma.m$delta)) sigma.m$delta <- 2.4^2
+  if (is.null(sigma.m$delta)) sigma.m$delta <- 0.05^2 #2.4^2
   if (is.null(sigma.m$theta.gpd)) sigma.m$theta.gpd <- (2.4/2)^2
   if (is.null(sigma.m$theta.c)) sigma.m$theta.c<- (2.4/2)^2
   if (is.null(sigma.m$tau)) sigma.m$tau <- 2.4^2
@@ -241,7 +241,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
                     theta.gpd = theta.gpd, tau_sqd = tau)
     delta <- metr.out.delta$trace[n.metr.updates.delta]
     r.hat.delta <- metr.out.delta$acc.prob
-    sigma.m$delta <- exp(log(sigma.m$delta) + gamma2*(r.hat.delta - metr.opt.1d))
+    # sigma.m$delta <- exp(log(sigma.m$delta) + gamma2*(r.hat.delta - metr.opt.1d))
     
 
     
