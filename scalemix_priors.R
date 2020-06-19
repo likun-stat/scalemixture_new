@@ -84,7 +84,7 @@ interval.unif <- function(params, hyper.params) {
   r <- hyper.params[2]
   l <- hyper.params[1]
   if (delta < l || delta > r) return(-Inf)
-  return(-log(w))
+  return(0)
 }
 #                                                                              #
 ################################################################################
