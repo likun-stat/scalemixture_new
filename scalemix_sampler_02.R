@@ -132,7 +132,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   
   r.hat.delta <- NA
   r.hat.theta.c <- NA
-  r.hat.range <- NA  # in case where roughness is not updated
+  # r.hat.range <- NA  # in case where roughness is not updated
   r.hat.theta.gpd <- NA
   r.hat.prob.below <- NA
   r.hat.tau <- NA
@@ -192,9 +192,9 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
                       n.updates = n.metr.updates.theta.c, prop.Sigma = 1,
                       sigma.m=sigma.m$range, verbose=FALSE,
                       X.s = X.s, S = S, nu = theta.c[2])
-    r.hat.range <- metr.out.theta.c$acc.prob
+    r.hat.theta.c <- metr.out.theta.c$acc.prob
     theta.c[1] <- metr.out.theta.c$trace[n.metr.updates.theta.c]
-    sigma.m$range <- exp(log(sigma.m$range) + gamma2*(r.hat.range - metr.opt.1d))
+    sigma.m$range <- exp(log(sigma.m$range) + gamma2*(r.hat.theta.c - metr.opt.1d))
 
         
     ## Re-create covariance matrix and eigenvectors/eigenvalues
