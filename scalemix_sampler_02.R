@@ -55,6 +55,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   hyper.params.theta.gpd <- 1
   hyper.params.tau <- 100 #c(0.1,0.1)
   hyper.params.theta.c <- c(1,1)
+  hyper.params.range <- c(0.5,1.5) # in case where roughness is not updated
   
   # A small number
   eps <- 1e-06
@@ -121,6 +122,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   if (is.null(sigma.m$delta)) sigma.m$delta <- 0.05^2 #2.4^2
   if (is.null(sigma.m$theta.gpd)) sigma.m$theta.gpd <- (2.4/2)^2
   if (is.null(sigma.m$theta.c)) sigma.m$theta.c<- (2.4/2)^2
+  if (is.null(sigma.m$range)) sigma.m$range<- 2.4/2  # in case where roughness is not updated
   if (is.null(sigma.m$tau)) sigma.m$tau <- 2.4^2
   if (is.null(sigma.m$R)) sigma.m$R <- rep(2.4^2, n.t)
     
@@ -130,6 +132,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   
   r.hat.delta <- NA
   r.hat.theta.c <- NA
+  r.hat.range <- NA  # in case where roughness is not updated
   r.hat.theta.gpd <- NA
   r.hat.prob.below <- NA
   r.hat.tau <- NA
@@ -170,18 +173,29 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
     ################################################################
     ## Update theta.c
     ################################################################
-    metr.out.theta.c <- static.metr(z = R, starting.theta = theta.c,
-                      likelihood.fn = theta.c.update.mixture.me.likelihood, 
-                      prior.fn = half.cauchy.half.cauchy, hyper.params = hyper.params.theta.c, 
-                      n.updates = n.metr.updates.theta.c, prop.Sigma = prop.Sigma$theta.c, 
-                      sigma.m=sigma.m$theta.c, verbose=FALSE,
-                      X.s = X.s, S = S)
-    r.hat.theta.c <- metr.out.theta.c$acc.prob
-    theta.c <- metr.out.theta.c$trace[n.metr.updates.theta.c, ]
-    sigma.m$theta.c <- exp(log(sigma.m$theta.c) + gamma2*(r.hat.theta.c - metr.opt.2d))
-    prop.Sigma$theta.c <- prop.Sigma$theta.c + gamma1*(cov(metr.out.theta.c$trace)-prop.Sigma$theta.c)
-   
-      
+    # metr.out.theta.c <- static.metr(z = R, starting.theta = theta.c,
+    #                   likelihood.fn = theta.c.update.mixture.me.likelihood, 
+    #                   prior.fn = half.cauchy.half.cauchy, hyper.params = hyper.params.theta.c, 
+    #                   n.updates = n.metr.updates.theta.c, prop.Sigma = prop.Sigma$theta.c, 
+    #                   sigma.m=sigma.m$theta.c, verbose=FALSE,
+    #                   X.s = X.s, S = S)
+    # r.hat.theta.c <- metr.out.theta.c$acc.prob
+    # theta.c <- metr.out.theta.c$trace[n.metr.updates.theta.c, ]
+    # sigma.m$theta.c <- exp(log(sigma.m$theta.c) + gamma2*(r.hat.theta.c - metr.opt.2d))
+    # prop.Sigma$theta.c <- prop.Sigma$theta.c + gamma1*(cov(metr.out.theta.c$trace)-prop.Sigma$theta.c)
+    
+    
+    ## in case where roughness is not updated
+    metr.out.theta.c <- static.metr(z = R, starting.theta = theta.c[1],
+                      likelihood.fn = range.update.mixture.me.likelihood,
+                      prior.fn = interval.unif, hyper.params = hyper.params.range,
+                      n.updates = n.metr.updates.theta.c, prop.Sigma = 1,
+                      sigma.m=sigma.m$range, verbose=FALSE,
+                      X.s = X.s, S = S, nu = theta.c[2])
+    r.hat.range <- metr.out.theta.c$acc.prob
+    theta.c[1] <- metr.out.theta.c$trace[n.metr.updates.theta.c]
+    sigma.m$range <- exp(log(sigma.m$range) + gamma2*(r.hat.range - metr.opt.1d))
+
         
     ## Re-create covariance matrix and eigenvectors/eigenvalues
     if(r.hat.theta.c>0) {

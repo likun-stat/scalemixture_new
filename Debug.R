@@ -47,7 +47,8 @@ fun<-Vectorize(fun)
 Shape <- seq(-0.005,0.005,length.out = 50)
 Lik <- fun(Shape)
 plot(Shape,Lik,type='l',ylab = 'Full Conditional for Shape parameter')
-abline(v=0,lty=2,col='red')
+abline(v=Shape[which.max(Lik)],lty=2,col='red')
+title(expression(u==0.98))
 grid()
 
 
@@ -82,6 +83,28 @@ plot(Nu,Lik,type='l',ylab = 'Full Conditional for Nu parameter')
 abline(v=Nu[which.max(Lik)],lty=2,col='red')
 grid()
 
+
+which.not.censored <- c(35,5)
+tmp <- X.s[which.not.censored[1], which.not.censored[2]]
+Cor   <- corr.fn(rdist(true.params$S), c(range,nu))
+eig.Sigma <- eigen(Cor, symmetric=TRUE)
+V <- eig.Sigma$vectors
+d <- eig.Sigma$values
+fun<- function(xstar){
+  prop_X_s <- X.s;
+  prop_X_s[which.not.censored[1], which.not.censored[2]] <- xstar
+  marg_transform_data_mixture_me_likelihood_uni(Y[which.not.censored[1], which.not.censored[2]], 
+            X[which.not.censored[1], which.not.censored[2]], prop_X_s[which.not.censored[1], which.not.censored[2]], 
+            cen[which.not.censored[1], which.not.censored[2]], true.params$prob.below, true.params$theta.gpd, 
+            delta, tau, thresh.X) + 
+    X_s_likelihood_conditional_cpp(prop_X_s[,which.not.censored[2]], R[which.not.censored[2]], V, d)
+}
+fun<-Vectorize(fun)
+Xs <- seq(tmp-10,tmp+11,length.out = 50)
+Lik <- fun(Xs)
+plot(Xs, Lik, type='l', ylab='Full Conditional for x*',xlab=expression(paste(x,'*')))
+abline(v=Xs[which.max(Lik)],lty=2,col='red')
+grid()
 
 ## ---------- Check the trace plots & the current full conditionals ----------
 plot(out.obj$delta.trace[1:state$i],type='l',ylab=expression(delta))

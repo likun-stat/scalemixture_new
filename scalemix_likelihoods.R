@@ -630,6 +630,35 @@ theta.c.update.mixture.me.likelihood <- function(data, params, X.s, S,
   return(sum(ll))
 }
 
+range.update.mixture.me.likelihood <- function(data, params, X.s, S, 
+                                                 nu, V=NULL, d=NULL) {
+  
+  library(doParallel)
+  library(foreach)
+  if (!is.matrix(X.s)) X.s <- matrix(X.s, ncol=1)
+  n.t <- ncol(X.s)
+  registerDoParallel(cores=n.t)
+  
+  R <- data
+  range <- params[1]
+  # nu <- params[2]
+  # if(lambda<0 || gamma<0 || gamma>2)  return(-Inf)
+  
+  if(is.null(V)){
+    Cor   <- corr.fn(rdist(S), theta=c(range,nu))
+    eig.Sigma <- eigen(Cor, symmetric=TRUE)
+    V <- eig.Sigma$vectors
+    d <- eig.Sigma$values
+  }
+  
+  ll<-foreach(i = 1:n.t, .combine = "c") %dopar% {
+    X.s.likelihood.conditional(X.s[,i], R[i], V, d)
+    # dmvn.eig(qnorm(1-R[i]/X.s[, i]), V = V, d.inv = 1/d)
+  }
+  
+  return(sum(ll))
+}
+
 
 #                                                                              #
 ################################################################################
