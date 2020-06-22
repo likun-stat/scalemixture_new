@@ -89,9 +89,11 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   
   # Initialize trace objects
   accepted <- rep(0, n.updates)
+  save.num <- n.t; subset.replicates <- 1:n.t
+  if(n.t>60) {save.num <- 30;subset.replicates<-ceiling(seq(1,n.t,length.out = 9))}
   # prob.below.trace <- rep(NA, n.updates)
-  X.s.trace <- array(NA, dim=c(n.updates, n.s, n.t))
-  X.trace <- array(NA, dim=c(n.updates, n.s, n.t))
+  X.s.trace <- array(NA, dim=c(n.updates, n.s, save.num))
+  X.trace <- array(NA, dim=c(n.updates, n.s, save.num))
   X.s.accept.trace <- matrix(NA, n.updates, n.t)
   tau.trace <- rep(NA, n.updates)
   delta.trace <- rep(NA, n.updates)
@@ -105,8 +107,8 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   colnames(theta.c.trace)   <- c("range", "nu")
   
   # Fill in trace objects with initial values
-  X.s.trace[1, , ] <- X.s
-  X.trace[1, , ] <- X
+  X.s.trace[1, , ] <- X.s[,subset.replicates]
+  X.trace[1, , ] <- X[,subset.replicates]
   X.s.accept.trace[1, ] <- X.s.accept
   tau.trace[1] <- tau
   delta.trace[1] <- delta
@@ -320,8 +322,8 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
     
     # ------------------------- Fill in trace objects ---------------------------
     # prob.below.trace[i] <- prob.below
-    X.s.trace[i, , ] <- X.s
-    X.trace[i, , ] <- X
+    X.s.trace[i, , ] <- X.s[,subset.replicates]
+    X.trace[i, , ] <- X[,subset.replicates]
     X.s.accept.trace[i, ] <- X.s.accept
     theta.c.trace[i,]<-theta.c
     tau.trace[i] <- tau
@@ -358,22 +360,24 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
         if (!is.null(true.params)) abline(h=true.params$R[j], lty=2, lwd=3, col="gray80")
       }
       # For each year, plot the location with an exceedance that happens to be first in the matrix
-      for (j in 1:min(18, n.t)) { 
-        plot.loc <- which(!cen[ ,j])[1]
+      for (j in 1:min(18, save.num)) { 
+        wh <- subset.replicates[j]
+        plot.loc <- which(!cen[ ,wh])[1]
         if (!is.na(plot.loc)) {
-          plot(X.s.trace[ , plot.loc, j], type="l",
-               ylab=paste0("X^*[", plot.loc, ",", j, "]"))
-          if (!is.null(true.params)) abline(h=true.params$X.s[plot.loc, j], lty=2, lwd=3, col="gray80")
+          plot(X.s.trace[ , plot.loc, wh], type="l",
+               ylab=paste0("X^*[", plot.loc, ",", wh, "]"))
+          if (!is.null(true.params)) abline(h=true.params$X.s[plot.loc, wh], lty=2, lwd=3, col="gray80")
         } else {
           plot(1, 1, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
         }
       }
       # For each year, plot the location with a non-exceedance that happens to be first in the matrix
-      for (j in 1:min(18, n.t)) { 
-        plot.loc <- which(cen[ ,j])[1]
+      for (j in 1:min(18, save.num)) { 
+        wh <- subset.replicates[j]
+        plot.loc <- which(cen[ ,wh])[1]
         if (!is.na(plot.loc)) {
-          plot(X.s.trace[ , plot.loc, j], type="l",
-               ylim=c(min(X.s.trace[ , plot.loc, j], na.rm=TRUE), thresh.X),
+          plot(X.s.trace[ , plot.loc, wh], type="l",
+               ylim=c(min(X.s.trace[ , plot.loc, wh], na.rm=TRUE), thresh.X),
                ylab=paste0("X^*[", plot.loc, ",", j, "]"))
           abline(h=thresh.X, lty=1, lwd=3, col="gray80")
         } else {
