@@ -20,7 +20,9 @@ nu <-  3/2        # Matern smoothness
 S     <- cbind(runif(n.s, 0, 1), runif(n.s, 0, 1))
 # Cor   <- corr.fn(rdist(S), lambda = lambda, gamma = gamma)
 Cor   <- corr.fn(rdist(S), theta=c(range,nu))
-C.Cor <- chol(Cor)
+eig.Sigma <- eigen(Cor, symmetric=TRUE)
+V <- eig.Sigma$vectors
+d <- eig.Sigma$values
 
 # set.seed(3333)
 u<-rep(NA,n.t)
@@ -34,11 +36,10 @@ for(t in 1:n.t){
 X <- matrix(NA, n.s, n.t)
 X.s <- matrix(NA, n.s, n.t)
 for(t in 1:n.t) {
-  Z.t<-crossprod(C.Cor, rnorm(n.s))
+  Z.t<-eig2inv.times.vector(V, sqrt(d), rnorm(n.s))
   Z.to.W.s<-1/(1-pnorm(Z.t))
   X.s[ ,t] <- R[t]*Z.to.W.s
   X[ ,t] <- X.s[ ,t] + sqrt(tau)*rnorm(n.s)
-  
 }
 
 

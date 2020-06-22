@@ -367,14 +367,14 @@ X.s.update.mixture.me.update.par.once.without.X.par <- function(R, Y, X, X.s, ce
   Res<-foreach(t = 1:n.t, .combine = "cbind")%dopar%{
     res<- update_X_s_onetime(Y = Y[,t], X = X[,t], X_s = X.s[,t], cen = cen[,t], prob_below = prob.below, 
                       theta_gpd = theta.gpd, delta = delta, tau_sqd = tau_sqd, thresh_X = thresh.X, R = R[t], V = V, d = d)
-    c(res$X.s, res$accept, t)
+    c(res$X.s, res$accept)
   }
   
   X.s <- Res[1:n.s, ]
   accepted <-Res[(n.s+1):(2*n.s),]
-  O<-order(Res[2*n.s+1,])
-  X.s <- X.s[,O]
-  accepted <- accepted[,O]
+  # O<-order(Res[2*n.s+1,])
+  # X.s <- X.s[,O]
+  # accepted <- accepted[,O]
   
   return(list(X.s=X.s, accepted=accepted))
 }

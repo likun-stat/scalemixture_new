@@ -1,10 +1,11 @@
 ## ---------- Make sure full conditionals attain maximum around the true values ----------
-tmp <- X.update(Y=Y, cen=cen, X.s=true.params$X.s, delta=true.params$delta, tau_sqd=true.params$tau, theta.gpd=true.params$theta.gpd, prob.below=prob.below)
+tmp <- X.update(Y=Y, cen=cen, X.s=true.params$X.s, delta=true.params$delta, 
+                tau_sqd=true.params$tau, theta.gpd=true.params$theta.gpd, prob.below=true.params$prob.below)
 
 which<-4; plot(true.params$X.s[,which]);points(tmp[,which],pch=20,col='red');abline(h=thresh.X)
 
 
-Cor   <- corr.fn(rdist(true.params$S), c(range,nu))
+Cor   <- corr.fn(rdist(true.params$S), true.params$theta.c)
 eig.Sigma <- eigen(Cor, symmetric=TRUE)
 V <- eig.Sigma$vectors
 d <- eig.Sigma$values
@@ -19,7 +20,7 @@ fun<- function(delta) delta.update.mixture.me.likelihood(data=true.params$R, par
                                                prob.below=prob.below, theta.gpd=true.params$theta.gpd,
                                                tau_sqd=true.params$tau)
 fun<-Vectorize(fun)
-Delta <- seq(0.52,0.55,length.out = 50)
+Delta <- seq(0.525,0.535,length.out = 50)
 Lik <- fun(Delta)
 plot(Delta,Lik,type='l',ylab = 'Full Conditional for Delta parameter')
 abline(v=0.7,lty=2,col='red')
@@ -64,8 +65,18 @@ abline(v=1,lty=2,col='red')
 grid()
 
 
-fun<- function(range) theta.c.update.mixture.me.likelihood(data=R, params=c(range, true.params$theta.c[2]), X.s=true.params$X.s, S=true.params$S, 
+fun<- function(range) theta.c.update.mixture.me.likelihood(data=state$R, params=c(range, true.params$theta.c[2]), X.s=true.params$X.s, S=true.params$S, 
                                                                        V=NULL, d=NULL)
+fun<-Vectorize(fun)
+Range <- seq(0.9,1.1,length.out = 50)
+Lik <- fun(Range)
+plot(Range,Lik,type='l',ylab = 'Full Conditional for Range parameter')
+abline(v=Range[which.max(Lik)],lty=2,col='red')
+grid()
+
+
+fun<- function(range) range.update.mixture.me.likelihood(data=true.params$R, params=range, X.s=true.params$X.s, S=true.params$S, 
+                                                           nu=true.params$theta.c[2], V=NULL, d=NULL)
 fun<-Vectorize(fun)
 Range <- seq(0.9,1.1,length.out = 50)
 Lik <- fun(Range)
@@ -82,6 +93,17 @@ Lik <- fun(Nu)
 plot(Nu,Lik,type='l',ylab = 'Full Conditional for Nu parameter')
 abline(v=Nu[which.max(Lik)],lty=2,col='red')
 grid()
+
+wh <-1
+fun<- function(r)  Rt.update.mixture.me.likelihood(data=R, params=r, X.s=X.s[,wh], delta, V=V, d=d)+
+               huser.wadsworth.prior(r, delta)
+fun<-Vectorize(fun)
+rr <- seq(R[wh]-1,R[wh]+1,length.out = 50)
+Lik <- fun(rr)
+plot(rr,Lik,type='l',ylab = 'Full Conditional for R')
+abline(v=R[wh],lty=2,col='red')
+grid()
+
 
 
 which.not.censored <- c(35,5)
@@ -106,6 +128,14 @@ plot(Xs, Lik, type='l', ylab='Full Conditional for x*',xlab=expression(paste(x,'
 abline(v=Xs[which.max(Lik)],lty=2,col='red')
 grid()
 
+
+
+
+##############
+true.params <- list(delta = state$delta, tau=state$tau, theta.gpd=state$theta.gpd, 
+                    theta.c=state$theta.c, prob.below=state$prob.below, X.s=state$X.s, R=state$R, S=state$S)
+##############
+
 ## ---------- Check the trace plots & the current full conditionals ----------
 plot(out.obj$delta.trace[1:state$i],type='l',ylab=expression(delta))
 state$sigma.m$delta  # current proposal variance
@@ -113,7 +143,7 @@ fun<- function(delta) delta.update.mixture.me.likelihood(data=state$R, params=de
                                                          prob.below=state$prob.below, theta.gpd=state$theta.gpd,
                                                          tau_sqd=state$tau)
 fun<-Vectorize(fun)
-Delta <- seq(0.69,0.71,length.out = 50)
+Delta <- seq(0.52,0.54,length.out = 50)
 Lik <- fun(Delta)
 plot(Delta,Lik,type='l',ylab = 'Full Conditional for Delta parameter')
 abline(v=0.65,lty=2,col='red')
@@ -183,4 +213,5 @@ if (sum(!cen) > 0) {
     dgpd(state$Y[!cen], loc=loc, scale=scale, shape=shape, log=TRUE)  -
     dmixture.me(X[!cen], tau_sqd = state$tau, delta = delta, log=TRUE)
 }
+
 
