@@ -17,7 +17,7 @@ nu <-  3/2        # Matern smoothness
 
 
 # -------------- 2. Generate fake data -----------------
-S     <- cbind(runif(n.s, 0, 1), runif(n.s, 0, 1))
+S     <- cbind(runif(n.s, 0, 5), runif(n.s, 0, 5))
 # Cor   <- corr.fn(rdist(S), lambda = lambda, gamma = gamma)
 Cor   <- corr.fn(rdist(S), theta=c(range,nu))
 eig.Sigma <- eigen(Cor, symmetric=TRUE)

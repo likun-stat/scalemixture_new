@@ -90,7 +90,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
   # Initialize trace objects
   accepted <- rep(0, n.updates)
   save.num <- n.t; subset.replicates <- 1:n.t
-  if(n.t>60) {save.num <- 30;subset.replicates<-ceiling(seq(1,n.t,length.out = 9))}
+  if(n.t>60) {save.num <- 30;subset.replicates<-ceiling(seq(1,n.t,length.out = save.num))}
   # prob.below.trace <- rep(NA, n.updates)
   X.s.trace <- array(NA, dim=c(n.updates, n.s, save.num))
   X.trace <- array(NA, dim=c(n.updates, n.s, save.num))
@@ -364,7 +364,7 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
         wh <- subset.replicates[j]
         plot.loc <- which(!cen[ ,wh])[1]
         if (!is.na(plot.loc)) {
-          plot(X.s.trace[ , plot.loc, wh], type="l",
+          plot(X.s.trace[ , plot.loc, j], type="l",
                ylab=paste0("X^*[", plot.loc, ",", wh, "]"))
           if (!is.null(true.params)) abline(h=true.params$X.s[plot.loc, wh], lty=2, lwd=3, col="gray80")
         } else {
@@ -376,8 +376,8 @@ scalemix.sampler.02 <- function(Y, S, cen, thresh,
         wh <- subset.replicates[j]
         plot.loc <- which(cen[ ,wh])[1]
         if (!is.na(plot.loc)) {
-          plot(X.s.trace[ , plot.loc, wh], type="l",
-               ylim=c(min(X.s.trace[ , plot.loc, wh], na.rm=TRUE), thresh.X),
+          plot(X.s.trace[ , plot.loc, j], type="l",
+               ylim=c(min(X.s.trace[ , plot.loc, j], na.rm=TRUE), thresh.X),
                ylab=paste0("X^*[", plot.loc, ",", j, "]"))
           abline(h=thresh.X, lty=1, lwd=3, col="gray80")
         } else {
