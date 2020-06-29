@@ -65,7 +65,7 @@ Y[!cen] <- scalemix.me.2.gpd(x = X[!cen], tau_sqd = tau, delta = delta, theta.gp
 
 
 ## --------------- 4. Saving initial values -------------------
-initial.values <- list(delta = delta-0.05, tau=tau+1, theta.gpd=c(thresh,theta.gpd[2],theta.gpd[3]+0.2), theta.c=c(range,nu), prob.below=prob.below, X.s=X.s, R=R, S=S)
+initial.values <- list(delta = delta-0.01, tau=tau+1, theta.gpd=c(thresh,theta.gpd[2],theta.gpd[3]+0.2), theta.c=c(range,nu), prob.below=prob.below, X.s=X.s, R=R, S=S)
 n.updates <- 50000
 thin <- 10
 echo.interval <- 50

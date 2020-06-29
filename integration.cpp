@@ -598,10 +598,10 @@ List update_X_s_onetime (NumericVector Y, NumericVector X, NumericVector X_s,
         // tripped : NumericVector X=Y, changing X will change Y as well.
         std::copy(X_s.begin(), X_s.end(), prop_X_s.begin());
         //temp = X_s(iter)+v_q(iter)*R::rnorm(0,1);
-        temp = X(iter)+sqrt(tau_sqd)*R::rnorm(0,1);
+        temp = X_s(iter)+sqrt(tau_sqd)*R::rnorm(0,1);
         prop_X_s(iter) = temp;
-        log_num = marg_transform_data_mixture_me_likelihood_uni(Y(iter), X(iter), prop_X_s(iter), cen(iter), prob_below, theta_gpd, delta, tau_sqd, thresh_X) + X_s_likelihood_conditional_cpp(prop_X_s, R, V, d) + R::dnorm(X_s(iter), X(iter), sqrt(tau_sqd), 1);
-        log_denom = marg_transform_data_mixture_me_likelihood_uni(Y(iter), X(iter), X_s(iter), cen(iter), prob_below, theta_gpd, delta, tau_sqd, thresh_X) + X_s_likelihood_conditional_cpp(X_s, R, V, d)+ R::dnorm(prop_X_s(iter), X(iter), sqrt(tau_sqd), 1);;
+        log_num = marg_transform_data_mixture_me_likelihood_uni(Y(iter), X(iter), prop_X_s(iter), cen(iter), prob_below, theta_gpd, delta, tau_sqd, thresh_X) + X_s_likelihood_conditional_cpp(prop_X_s, R, V, d);
+        log_denom = marg_transform_data_mixture_me_likelihood_uni(Y(iter), X(iter), X_s(iter), cen(iter), prob_below, theta_gpd, delta, tau_sqd, thresh_X) + X_s_likelihood_conditional_cpp(X_s, R, V, d);
         
         r = exp(log_num - log_denom);
         if(!std::isfinite(r)) r = 0;
